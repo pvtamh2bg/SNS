@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -6,12 +7,14 @@ use Facebook\Exceptions\FacebookSDKException;
 use Facebook\Facebook;
 use Illuminate\Support\Facades\Log;
 use App\Library\Services\DownloadImg;
+
 class InstagramController extends Controller {
     const HEAD_GRAPH_LINK = 31;
 
     private $__api;
     private $__errMessage = '';
     private $__medias = [];
+
 
     public function __construct(Facebook $fb) {
         $this->middleware(function($request, $next) use ($fb) {
@@ -21,12 +24,24 @@ class InstagramController extends Controller {
         });
     }
 
+    public function getMedias() {
+        return $this->__medias;
+    }
+
     public function index(Request $request) {
         $this->__getMedias($request);
 
         return $this->getMedias();
     }
 
+    /**
+     *
+     * GET information of user logged
+     *
+     * @param $ig_id
+     *
+     * @return array
+     */
     public function retrieveUserProfile($ig_id) {
 
         try {
@@ -37,6 +52,12 @@ class InstagramController extends Controller {
         }
     }
 
+    /**
+     *
+     * GET All Business account of list page
+     *
+     * @return array|bool
+     */
     public function getListPageConnected() {
         try {
             $pages = $this->__api->get('/me/accounts?fields=id,name,instagram_business_account{username,name,profile_picture_url}')->getGraphEdge()->asArray();
@@ -57,7 +78,14 @@ class InstagramController extends Controller {
         }
     }
 
-
+    /**
+     *
+     * GET Account Business Account connect with page
+     *
+     * @param $pageID
+     *
+     * @return bool
+     */
     private function __getIdInstagram($pageID) {
         try {
             $data = $this->__api->get('/' . $pageID . '?fields=instagram_business_account')->getGraphEdge()->asArray();
@@ -71,7 +99,16 @@ class InstagramController extends Controller {
         }
     }
 
-
+    /**
+     *
+     * GET All Media Instagram Social
+     *
+     * @param Request $request
+     * @param null $next
+     * @param bool $download
+     *
+     * @return array|bool
+     */
     public function __getMedias(Request $request, $next = null, $download = false) {
 
         if (!$request->input('ig_user_id') || !$request->input('date_req'))
@@ -105,19 +142,29 @@ class InstagramController extends Controller {
         }
     }
 
+    /**
+     *
+     * Filter data
+     *
+     * @param $tweets array Data get from API
+     * @param $date string Date request
+     *
+     * @return array
+     */
     private function __filterData($data, $date, $download = false) {
         if (!$data || empty($data))
             return false;
 
         $tmp = [];
+
         foreach ($data as $key => $item) {
-            if($download){
+            if ($download) {
                 if ($item['media_type'] !== 'IMAGE')
                     continue;
             }
 
             if (strtotime(date('Y-m', strtotime($item['timestamp']))) == strtotime($date)) {
-                $item['timestamp'] = date('H:s . Y/m/d',strtotime($item['timestamp']));
+                $item['timestamp'] = date('H:s . Y/m/d', strtotime($item['timestamp']));
                 $tmp[] = $item;
             }
         }
@@ -125,21 +172,19 @@ class InstagramController extends Controller {
         return $tmp;
     }
 
-    public function getMedias() {
-        return $this->__medias;
-    }
-
-
-    /*
-     * download image allow month
-     * @param $username string get from url
-     * @param $date_req string get from url
-     * return void
+    /**
+     *
+     * Download Image Follow request
+     *
+     * @param Request $request
+     * @param DownloadImg $download
+     *
+     * @return bool
      */
     public function downloadImg(Request $request, DownloadImg $download) {
-        if( !$request->input('ig_user_id') || !$request->input('username') || !$request->input('date_req')){
+        if (!$request->input('ig_user_id') || !$request->input('username') || !$request->input('date_req'))
             return false;
-        }
+
         return $download->saveMedia($request, $this->__getMedias($request, null, true));
     }
 }

@@ -1,16 +1,13 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
-
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Mockery\Exception;
-
 use App\Http\Resources\Tweet as TweetResource;
-
 use App\Library\Services\DownloadImg;
 
 class TwitterController extends Controller {
@@ -18,32 +15,34 @@ class TwitterController extends Controller {
     const  TIME_GET_TWEET = 16;
 
     private $__count_time_get_tweet = 0;
-
     private $__tokenNum = 0;
     private $__errMessage = "";
     private $__tweets = [];
 
-    /*
-     * get list tweet from user request
-     * @param $request String Get username and date request
-     */
     public function index(Request $request) {
         $this->__getTweets($request);
-        return TweetResource::collection($this->__tweets)->additional(
+        return TweetResource::collection($this->getTweets())->additional(
             ['meta' => [
                 'messages' => $this->__errMessage
                 ]
             ]);
     }
 
-    /*
-     * get tweet from api
+    public function getTweets(){
+        return $this->__tweets;
+    }
+
+    /**
+     *
+     * GET Tweets from Api
+     *
      * @param $request List params
+     *
      * return object
      */
     private function __getTweets($request, $max_id = null, $download = false) {
-        if (++$this->__count_time_get_tweet > self::TIME_GET_TWEET ) {
-            $this->__errMessage = 'Don\'t have any tweets or total number of tweets of the '.date('m/Y', strtotime($request->input('date_req'))).' exceeded limit the availability';
+        if (++$this->__count_time_get_tweet > self::TIME_GET_TWEET) {
+            $this->__errMessage = 'Don\'t have any tweets or total number of tweets of the ' . date('m/Y', strtotime($request->input('date_req'))) . ' exceeded limit the availability';
             return false;
         }
 
@@ -80,19 +79,22 @@ class TwitterController extends Controller {
         $dateRq = new \DateTime($request->input('date_req'));
 
         if ($timestamp_create_at->getTimestamp() < $dateRq->getTimestamp()) {
-            $this->__tweets = array_merge($this->__tweets,$this->__filterData($tweets, $request->input('date_req'), $download));
+            $this->__tweets = array_merge($this->__tweets, $this->__filterData($tweets, $request->input('date_req'), $download));
             return $this->__tweets;
-        }else{
+        } else {
             $max_id = end($tweets)->id;
             array_pop($tweets);
-            $this->__tweets = array_merge($this->__tweets,$this->__filterData($tweets, $request->input('date_req'), $download));
+            $this->__tweets = array_merge($this->__tweets, $this->__filterData($tweets, $request->input('date_req'), $download));
             $this->__getTweets($request, $max_id);
         }
     }
 
-    /*
-     * get info user
+    /**
+     *
+     * GET info User login
+     *
      * @param $request String Get username from request
+     *
      * @return json
      */
     public function getProfile(Request $request) {
@@ -105,13 +107,16 @@ class TwitterController extends Controller {
         );
 
         $info = $this->__apiGet('users/show', $option);
+
         return json_encode($info);
     }
 
-    /*
-     * get data from api
+    /**
+     * Get Data From Api
+     *
      * @param $path String Endpoint in API
      * @param $option array List param for get api
+     *
      * @return object
      */
     private function __apiGet($path, $option) {
@@ -141,14 +146,18 @@ class TwitterController extends Controller {
             }
             return false;
         }
+
         return $res;
     }
 
-    /*
-     * Filter data, only image
+    /**
+     *
+     * Filter data
+     *
      * @param $tweets array Data get from API
      * @param $date string Date request
-     * return array
+     *
+     * @return array
      */
     private function __filterData($tweets, $date, $download = false) {
         if (!isset($tweets) && empty($tweets)) {
@@ -156,31 +165,37 @@ class TwitterController extends Controller {
         }
         $result = array();
         foreach ($tweets as $val) {
-            // retweeted_status: bài viết dc tweet lại của other user
-            if(isset($val->retweeted_status)) continue;
-            if($download){
+
+            if (isset($val->retweeted_status))
+                continue;
+
+            ## Filter post is image
+            if ($download) {
                 if (!isset($val->extended_entities) || $val->extended_entities->media[0]->type === "video" || $val->extended_entities->media[0]->type === "animated_gif") {
                     continue;
                 }
             }
+            ## Filter post follow month
             $dateSocail = date('Y-m', strtotime($val->created_at));
             if (strtotime($dateSocail) === strtotime($date)) {
                 $result[] = $val;
             }
         }
+
         return $result;
     }
 
-    /*
-     * download image allow month
-     * @param $username string get from url
-     * @param $date_req string get from url
-     * return void
+    /**
+     *
+     * Download Image Follow request
+     * @param Request $request
+     * @param DownloadImg $download
+     * @return bool
      */
     public function downloadImg(Request $request, DownloadImg $download) {
-        if( !$request->input('username') || !$request->input('date_req')){
+        if (!$request->input('username') || !$request->input('date_req'))
             return false;
-        }
+
         return $download->saveMedia($request, $this->__getTweets($request, null, true));
     }
 }
