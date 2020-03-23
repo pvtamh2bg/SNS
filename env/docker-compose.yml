@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+  pdmtest:
+    image: pdmweb
+    container_name: pdmweb
+    restart: always
+    hostname: vagrant
+    ports:
+    - "80:80"
+    - "443:443"
+    environment:
+    - IS_DOCKER=1
+    - PRODUCT_ENV=develop
+    volumes:
+    - ./../:/var/www/html/:rw
+    network_mode: bridge
+    privileged: true

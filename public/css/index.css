@@ -1,0 +1,108 @@
+	#detail-gallery .result-content.active{
+		/*opacity: 0.2;*/
+		background-color: black;
+	}
+	#detail-gallery .body-title{
+		margin: 0 auto;
+		color: #5F5F5F;
+	}
+	#detail-gallery .box{
+	 	padding: 5px;
+	 	position: relative;
+	}
+    #detail-gallery .wrapper {
+        width: 100%;
+        display: grid;
+    	grid-gap: 25px;
+        grid-template-columns: repeat(4, minmax(100px, 350px));
+    }
+	#detail-gallery .content-container{
+		border: 1px solid #F4F4F4;
+		height: 450px;
+	}
+	#detail-gallery .top-content{
+		display: flex;
+		height: 40px;
+		padding: 3px 10px 3px 10px;
+	}
+	#detail-gallery .icon-container{
+		height: 20px;
+    	width: 20px;
+        margin-top: 9px;
+    	margin-right: 4px;
+	}
+	#detail-gallery .text-top-content{
+		position: relative;
+		height: 40px;
+	}
+	#detail-gallery .sns-name{
+		font-size: 13px;
+		position: absolute;
+		overflow: hidden;
+	    white-space: nowrap;
+	    text-overflow: ellipsis;
+	}
+	#detail-gallery .sns-account{
+		font-size: 13px;
+		color: #5F5F5F;
+		position: absolute;
+		padding-top: 17px;
+		overflow: hidden;
+	    white-space: nowrap;
+	    text-overflow: ellipsis;
+	}
+	#detail-gallery .image-content{
+		position: relative;
+		padding-top: 5px;
+		width: 100%;
+		height: 250px;
+	}
+	#detail-gallery .description-content{
+		font-size: 13px;
+		color: #919191;
+		height: 100px;
+		width: 100%;
+		padding-top: 3px;
+		padding-left: 5px;
+		padding-bottom: 3px;
+		padding-right: 5px;
+		margin-top: 5px;
+		overflow: hidden;
+	    text-overflow: ellipsis;
+	}
+	#detail-gallery .text-date-area{
+		color: #2d2b1c;
+		font-size: 14px;
+		font-weight: 600;
+	}
+	#detail-gallery .icon-function-area{
+	    margin-top: 4px;
+    	font-size: 11px;
+    	font-weight: 500;
+    	color: #5F5F5F;
+	}
+	#detail-gallery .reaction {
+		margin-left: 7px;
+		padding: 1px;
+		display: inline-flex;
+	}
+	#detail-gallery .date-area{
+	    position: absolute;
+		z-index: 1;
+		width: 100%;
+		height: 10%;
+		padding-top: 2px;
+		padding-left: 12px;
+		background-color: #fff;
+		opacity: 0.7;
+	}
+	#detail-gallery .date-time-area{
+		font-size: 11px;
+    	margin-top: 10px;
+    	margin-left: 2px;
+	}
+	#detail-gallery img{
+		height: 100%;
+		width: 100%;
+		object-fit: cover;
+	}

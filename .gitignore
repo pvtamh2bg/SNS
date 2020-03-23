@@ -1,0 +1,25 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+/storage/debugbar/
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+.idea
+.composer.lock
+package-lock.json
+
+# Database Backup
+env/image/laravelweb/files/db/
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
